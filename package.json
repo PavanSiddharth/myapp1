@@ -32,7 +32,7 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "node --exec babel-node client.js",
+    "start": "node client.js",
     "build": "set \"INLINE_RUNTIME_CHUNK=false\" && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -64,6 +64,5 @@
     "npm-run-all": "^4.1.5",
     "pino-colada": "^2.1.0"
   },
-  "engines": { "node" : "12.16.1" },
-  "homepage": "http://ec2-13-232-211-21.ap-south-1.compute.amazonaws.com:3000"
+  "engines": { "node" : "12.16.1" }
 }
