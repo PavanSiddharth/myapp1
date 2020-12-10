@@ -9,6 +9,11 @@ app.use(compression());
 
 app.use(morgan("combined"));
 
+app.use(function(req, res, next) {
+  res.setHeader("Content-Security-Policy", "default-src *");
+  return next();
+});
+
 // Serve the static files from the build folder
 app.use(express.static( __dirname + "/build"));
 //app.use('/material-dashboard-react', express.static(__dirname + "/build"));
