@@ -36,7 +36,7 @@ class MyApp extends Component {
   } ) );
 
     event.preventDefault();
-    fetch('http://ec2-13-232-211-21.ap-south-1.compute.amazonaws.com:3001/submit', {
+    fetch('/submit', {
       method: 'POST',
       body: data,
     }).then((response) => {
@@ -50,7 +50,7 @@ class MyApp extends Component {
     const data = new FormData();
     data.append('file', this.uploadInput.files[0]);
 
-    fetch('http://ec2-13-232-211-21.ap-south-1.compute.amazonaws.com:3001/upload', {
+    fetch('/upload', {
       method: 'POST',
       body: data,
     }).then((response) => {
