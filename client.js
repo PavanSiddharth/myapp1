@@ -65,6 +65,7 @@ app.post('/submit', (req, res) => {
           console.log(result);
       });*/
         con.end();
+        res.send("Successful");
     });
   }
   catch(error)
