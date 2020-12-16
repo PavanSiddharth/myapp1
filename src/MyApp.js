@@ -7,11 +7,19 @@ class MyApp extends Component {
       url: '',
       name: '',
       type: '',
+      videodisabled: true,
+      imagedisabled: true,
+      fileselected: false,
+      imageselected: false,
+      showmessage: false,
+      displayusermessage: false,
+      usermessage: ""
     };
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleTypeChange = this.handleTypeChange.bind(this);
     this.handleUrlChange = this.handleUrlChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.validate = this.validate.bind(this);
+    //this.handleSubmit = this.handleSubmit.bind(this);
     this.handleFileUpload = this.handleFileUpload.bind(this);
   }
 
@@ -20,6 +28,21 @@ class MyApp extends Component {
   }
 
   handleTypeChange(event) {
+    if(event.target.value=="Video")
+    {
+      this.setState({videodisabled: false})
+      this.setState({imagedisabled: true})
+    }
+    if(event.target.value=="Image")
+    {
+      this.setState({imagedisabled: false})
+      this.setState({videodisabled: true})
+    }
+    if(event.target.value=="Text")
+    {
+      this.setState({imagedisabled: true})
+      this.setState({videodisabled: true})
+    }
     this.setState({ type: event.target.value });
   }
 
@@ -27,7 +50,7 @@ class MyApp extends Component {
     this.setState({ url: event.target.value });
   }
 
-  handleSubmit(event) {
+  /*handleSubmit(event) {
     var data = new FormData();
     data.append( "json", JSON.stringify( {
       name: this.state.name,
@@ -42,20 +65,59 @@ class MyApp extends Component {
     }).then((response) => {
         console.log(response.json());
       });
+  }*/
+
+  validate()
+  {
+    if(!this.state.fileselected || this.state.name=="")
+    {
+      return false;
+    }
+    else if(!this.state.videodisabled && this.state.url=="")
+    {
+      return false;
+    }
+    else if(!this.state.imagedisabled && !this.state.imageselected)
+    {
+      return false;
+    }
+    else
+      return true;
   }
 
-  handleFileUpload(event){
+  async handleFileUpload(event){
     event.preventDefault();
+    if(!this.validate())
+    {
+      this.setState({showmessage: true})
+    }
+    else
+    {
+    this.setState({showmessage: false})
     console.log(event)
     const data = new FormData();
+    if(!this.state.imagedisabled)
+    {
+      data.append('image', this.uploadInput1.files[0]);
+    }
     data.append('file', this.uploadInput.files[0]);
 
-    fetch('/upload', {
+    data.append( "json", JSON.stringify( {
+      name: this.state.name,
+      type: this.state.type,
+      url: this.state.url
+    } ) );
+
+    event.preventDefault();
+    const response = await fetch('/submit', {
       method: 'POST',
       body: data,
-    }).then((response) => {
-        console.log(response.json());
-      });
+    })
+    const { message } = await response.json();
+    this.setState({usermessage: message});
+    this.setState({displayusermessage: true})
+    }
+    
   }
 
 
@@ -63,31 +125,45 @@ class MyApp extends Component {
     return (
       <div>
         <form onSubmit={this.handleFileUpload}>
-          <input type="file" id="myfile" name="myfile" ref={(ref) => { this.uploadInput = ref; }}/>
-          <button type="submit">Submit</button>
-        </form>
-          <form onSubmit={this.handleSubmit}>
+          <input type="file" id="myfile" name="myfile" ref={(ref) => { this.uploadInput = ref; }} onChange={(e)=>{
+            if(e.target.value.length)
+            {
+              this.setState({fileselected: true})
+            }
+          }}/>
             <label htmlFor="name">Enter lesson name: </label>
             <input
               id="name"
               type="text"
               onChange={this.handleNameChange}
             />
-            <label htmlFor="name">Enter lesson type: </label>
-            <input
-              id="type"
-              type="text"
-              onChange={this.handleTypeChange}
-            />
+            <label htmlFor="name">Choose lesson type: </label>
+            <select onChange={this.handleTypeChange}>
+              <option value="Text">Text</option>
+              <option value="Image">Image</option>
+              <option value="Video">Video</option>
+            </select>
+
             <label htmlFor="name">Enter lesson url: </label>
             <input
               id="url"
               type="text"
+              disabled = {(this.state.videodisabled)? "disabled" : ""}
               onChange={this.handleUrlChange}
             />
+             <label htmlFor="name">Upload Image</label>
+            <input type="file" id="myfile1" name="myfile1" ref={(ref) => { this.uploadInput1 = ref; }} disabled = {(this.state.imagedisabled)? "disabled" : ""} onChange={(e)=>{
+            if(e.target.value.length)
+            {
+              this.setState({imageselected: true})
+            }
+          }}/>
             <button type="submit">Submit</button>
           </form>
+          {this.state.showmessage? (<h2>Some of the required fields are missing</h2>) : null}
+          {this.state.displayusermessage? (<h2>{this.state.usermessage}</h2>) : null}
       </div>
+      
     );
   }
 }

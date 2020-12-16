@@ -45,13 +45,49 @@ app.get('/', function(req, res){
 app.post('/submit', (req, res) => {
   var jsonObj = JSON.parse(req.body.json);
   console.log(jsonObj['name']);
+  console.log(req.files.file)
+  console.log(req.files.image)
 
+            let s3 = new AWS.S3({
+                accessKeyId: "AKIAQC3RSOMX32RZBBOO",
+                secretAccessKey: "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",
+                Bucket: "lessonfiles",
+              });
+    
+            let params = {
+                Bucket: 'lessonfiles',
+                Key: req.files.file.name ,
+                Body: req.files.file.data
+            };
+            s3.upload(params, (err, result) => {
+                if(err) {
+                   console.log("Error", err);
+                } else {
+                   console.log("S3 Response",result);
+                }
+            })
+            if(req.files.image!==undefined)
+            {
+            let params1 = {
+              Bucket: 'lessonfiles',
+              Key: req.files.image.name ,
+              Body: req.files.image.data
+          };
+          s3.upload(params1, (err, result) => {
+              if(err) {
+                 console.log("Error", err);
+              } else {
+                 console.log("S3 Response",result);
+              }
+          })
+        }
   try
   {
     con.connect(function(err) {
         if (err) 
         {
           console.log(err);
+          res.send({mesage: "Not Successful"})
         }
         console.log("Connected!");
         /*var sql = "insert into details(url,name,type) values ?";
@@ -65,7 +101,7 @@ app.post('/submit', (req, res) => {
           console.log(result);
       });*/
         con.end();
-        res.json({message: "successful"});
+        res.send({message: "successful"});
     });
   }
   catch(error)
@@ -115,7 +151,7 @@ app.get('/test',(req, res) => {
   res.json({message: "Hello"})
 })
 
-app.post('/upload',(req, res) => {
+/*app.post('/upload',(req, res) => {
     console.log(req.files.file)
 
             let s3 = new AWS.S3({
@@ -136,7 +172,7 @@ app.post('/upload',(req, res) => {
                    console.log("S3 Response",result);
                 }
             })
-        });
+        });*/
 
 
   app.post('/download',(req, res) =>  {
