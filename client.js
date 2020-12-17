@@ -175,9 +175,9 @@ app.get('/test',(req, res) => {
         });*/
 
 
-  app.post('/download',(req, res) =>  {
+    app.post('/download', (req, res) =>  {
     console.log("Body:")
-  console.log(req.body.lesson)
+  //console.log(req.body.lesson)
 
   var s3 = new AWS.S3({
     accessKeyId: "AKIAQC3RSOMX32RZBBOO",
@@ -186,12 +186,13 @@ app.get('/test',(req, res) => {
 
 //const writeFile = util.promisify(fs.writeFile)
 
-s3.getObject({Bucket: 'lessonfiles', Key: req.body.lesson+".txt"}).promise().then((data) => {
-  console.log(data.Body)
-  console.log(String.fromCharCode.apply(null, new Uint16Array(data.Body)))
+s3.getObject({Bucket: 'lessonfiles', Key: "lesson1"+".txt"}).promise().then((data) => {
+  var enc = new TextDecoder("utf-8");
+  var arr = new Uint8Array(data.Body);
+  console.log(enc.decode(arr));
   //writeFile('./test.txt', data.Body)
   console.log('file downloaded successfully')
-  res.json({string : String.fromCharCode.apply(null, new Uint16Array(data.Body))})
+  res.json({string : enc.decode(arr)})
 }).catch((err) => {
   throw err
 })

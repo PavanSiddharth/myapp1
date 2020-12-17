@@ -107,8 +107,6 @@ class MyApp extends Component {
       type: this.state.type,
       url: this.state.url
     } ) );
-
-    event.preventDefault();
     const response = await fetch('/submit', {
       method: 'POST',
       body: data,
