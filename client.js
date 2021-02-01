@@ -47,6 +47,9 @@ app.post('/submit', (req, res) => {
   console.log(jsonObj['name']);
   console.log(req.files.file)
   console.log(req.files.image)
+  var image = '';
+  if(req.files.image!==undefined)
+    image = req.files.image.name
 
             let s3 = new AWS.S3({
                 accessKeyId: "AKIAQC3RSOMX32RZBBOO",
@@ -94,7 +97,7 @@ app.post('/submit', (req, res) => {
         con.query(sql, [[jsonObj['url'], jsonObj['name'], jsonObj['type']]], function(error, result, fields) {
           console.log(result);
         });*/
-        con.query(`INSERT INTO details (url, name, type) VALUES ('${jsonObj['url']}', '${jsonObj['name']}', '${jsonObj['type']}')`,function(error, result, fields) {
+        con.query(`INSERT INTO details (url, name, type, image) VALUES ('${jsonObj['url']}', '${jsonObj['name']}', '${jsonObj['type']}', '${image}')`,function(error, result, fields) {
           console.log(result);
       });
         /*con.query('CREATE TABLE IF NOT EXISTS details(id int NOT NULL AUTO_INCREMENT, url varchar(255), name varchar(255), type varchar(255), PRIMARY KEY(id));', function(error, result, fields) {
@@ -186,7 +189,7 @@ app.get('/test',(req, res) => {
 
 //const writeFile = util.promisify(fs.writeFile)
 
-s3.getObject({Bucket: 'lessonfiles', Key: "lesson1"+".txt"}).promise().then((data) => {
+s3.getObject({Bucket: 'lessonfiles', Key: req.body.lesson+".txt"}).promise().then((data) => {
   var enc = new TextDecoder("utf-8");
   var arr = new Uint8Array(data.Body);
   console.log(enc.decode(arr));
@@ -199,5 +202,43 @@ s3.getObject({Bucket: 'lessonfiles', Key: "lesson1"+".txt"}).promise().then((dat
 
 });
 
+app.get('/vocabulary',(req, res) => {
+  var s3 = new AWS.S3({
+    accessKeyId: "AKIAQC3RSOMX32RZBBOO",
+    secretAccessKey: "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"
+  });
+  con.connect(function(err) {
+    con.query(`SELECT * FROM details`, function(err, result, fields) {
+      if (err) console.log(err);
+      if (result) 
+      {
+        //console.log(result)
+        var promises = result.map(lesson => {
+          return s3.getObject({Bucket: 'lessonfiles', Key: lesson.name+".txt"}).promise().then((data) => {
+            var enc = new TextDecoder("utf-8");
+            var arr = new Uint8Array(data.Body);
+            //console.log(enc.decode(arr));
+            //writeFile('./test.txt', data.Body)
+            console.log('file downloaded successfully')
+            //mystring=mystring+enc.decode(arr)+" ";
+            //console.log(mystring);
+            return enc.decode(arr);
+            //res.json({string : enc.decode(arr)})
+          })
+      })
+      Promise.all(promises).then(function(results) {
+        var mystring = ""
+        //console.log(results)
+        results.map(result => {
+          mystring=mystring+result+" ";
+        })
+        console.log(mystring)
+        res.json({string : mystring})
+    })
+    }
+  });
+
+  })
+})
 
 app.listen(process.env.PORT || 8080);

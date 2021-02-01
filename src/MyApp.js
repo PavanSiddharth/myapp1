@@ -6,7 +6,8 @@ class MyApp extends Component {
     this.state = {
       url: '',
       name: '',
-      type: '',
+      type: 'Text only',
+      image: '',
       videodisabled: true,
       imagedisabled: true,
       fileselected: false,
@@ -23,25 +24,41 @@ class MyApp extends Component {
     this.handleFileUpload = this.handleFileUpload.bind(this);
   }
 
+
   handleNameChange(event) {
     this.setState({ name: event.target.value });
   }
 
   handleTypeChange(event) {
-    if(event.target.value=="Video")
+    if(event.target.value=="Video+Text")
     {
       this.setState({videodisabled: false})
       this.setState({imagedisabled: true})
     }
-    if(event.target.value=="Image")
+    if(event.target.value=="Image+Text")
     {
       this.setState({imagedisabled: false})
       this.setState({videodisabled: true})
     }
-    if(event.target.value=="Text")
+    if(event.target.value=="Text only")
     {
       this.setState({imagedisabled: true})
       this.setState({videodisabled: true})
+    }
+    if(event.target.value=="Audio only")
+    {
+      this.setState({imagedisabled: true})
+      this.setState({videodisabled: false})
+    }
+    if(event.target.value=="Audio+Text")
+    {
+      this.setState({imagedisabled: true})
+      this.setState({videodisabled: false})
+    }
+    if(event.target.value=="Image+Audio")
+    {
+      this.setState({imagedisabled: false})
+      this.setState({videodisabled: false})
     }
     this.setState({ type: event.target.value });
   }
@@ -137,9 +154,12 @@ class MyApp extends Component {
             />
             <label htmlFor="name">Choose lesson type: </label>
             <select onChange={this.handleTypeChange}>
-              <option value="Text">Text</option>
-              <option value="Image">Image</option>
-              <option value="Video">Video</option>
+              <option value="Text only">Text only</option>
+              <option value="Image+Text">Image+Text</option>
+              <option value="Video+Text">Video+Text</option>
+              <option value="Audio+Text">Audio+Text</option>
+              <option value="Image+Audio">Image+Audio</option>
+              <option value="Audio only">Audio only</option>
             </select>
 
             <label htmlFor="name">Enter lesson url: </label>
