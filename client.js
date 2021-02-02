@@ -27,6 +27,12 @@ app.use(cors());
 app.use(fileUpload());
 app.use(morgan("combined"));
 
+var bodyParser = require('body-parser')
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+// parse application/json
+app.use(bodyParser.json())
+
 app.use(function(req, res, next) {
   res.setHeader("Content-Security-Policy", "default-src *");
   return next();
@@ -153,6 +159,40 @@ app.get('/',(req, res) => {
 app.get('/test',(req, res) => {
   res.json({message: "Hello"})
 })
+
+function encode(data){
+  let buf = Buffer.from(data);
+  let base64 = buf.toString('base64');
+  return base64
+}
+
+async function getImage(img) {
+var s3 = new AWS.S3({
+  accessKeyId: "AKIAQC3RSOMX32RZBBOO",
+  secretAccessKey: "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"
+});
+const data =  s3.getObject(
+  {
+      Bucket: 'lessonfiles',
+      Key: img
+    }
+  
+).promise();
+return data;
+  }
+
+app.post('/testimage',(req, res) => {
+  console.log(req)
+  getImage(req.body.image)
+  .then((img)=>{
+    res.json({image:encode(img.Body)})
+  }).catch((e)=>{
+    res.send(e)
+  })
+    })
+//const writeFile = util.promisify(fs.writeFile)
+
+
 
 /*app.post('/upload',(req, res) => {
     console.log(req.files.file)
