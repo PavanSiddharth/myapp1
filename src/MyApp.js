@@ -60,6 +60,16 @@ class MyApp extends Component {
       this.setState({imagedisabled: false})
       this.setState({videodisabled: false})
     }
+    if(event.target.value=="Image only")
+    {
+      this.setState({imagedisabled: false})
+      this.setState({videodisabled: true})
+    }
+    if(event.target.value=="Browser")
+    {
+      this.setState({imagedisabled: true})
+      this.setState({videodisabled: false})
+    }
     this.setState({ type: event.target.value });
   }
 
@@ -160,6 +170,8 @@ class MyApp extends Component {
               <option value="Audio+Text">Audio+Text</option>
               <option value="Image+Audio">Image+Audio</option>
               <option value="Audio only">Audio only</option>
+              <option value="Image only">Image only</option>
+              <option value="Browser">Browser</option>
             </select>
 
             <label htmlFor="name">Enter lesson url: </label>
