@@ -7,7 +7,7 @@ const AWS = require('aws-sdk');
 const mysql = require('mysql');
 
 const con = mysql.createConnection({
-  host: "database-1.cpehnlgbk0me.ap-south-1.rds.amazonaws.com",
+  host: "finaldb.cpehnlgbk0me.ap-south-1.rds.amazonaws.com",
   user: "admin",
   port: "3306",
   password: "adminpassword",
@@ -218,6 +218,76 @@ app.post('/testimage',(req, res) => {
         });*/
 
 
+    app.post('/addvocab', (req, res) =>  {
+      const con = mysql.createConnection({
+        host: "finaldb.cpehnlgbk0me.ap-south-1.rds.amazonaws.com",
+        user: "admin",
+        port: "3306",
+        password: "adminpassword",
+        database: "lessons",
+        queryTimeout: 6000,
+        connectTimeout: 60000
+      });
+          console.log("Body:")
+          console.log(req.body)
+          var word = req.body.word
+          var uid = parseInt(req.body.uid)
+  try
+  {
+    con.connect(function(err) {
+        if (err) 
+        {
+          console.log(err);
+          //res.send({mesage: "Not Successful"})
+        }
+        console.log("Connected!");
+        con.query(`INSERT INTO vocabulary (uid, word) VALUES ('${uid}', '${word}')`,function(error, result, fields) {
+          console.log(result);
+      });
+        //res.send({message: "successful"});
+    });
+  }
+  catch(error)
+  {
+    console.log(error);
+  }
+})
+
+    app.post('/deletevocab', (req, res) =>  {
+      const con = mysql.createConnection({
+        host: "finaldb.cpehnlgbk0me.ap-south-1.rds.amazonaws.com",
+        user: "admin",
+        port: "3306",
+        password: "adminpassword",
+        database: "lessons",
+        queryTimeout: 6000,
+        connectTimeout: 60000
+      });
+      console.log("Body:")
+      console.log(req.body)
+      var word = req.body.word
+      var uid = parseInt(req.body.uid)
+try
+{
+con.connect(function(err) {
+    if (err) 
+    {
+      console.log(err);
+      //res.send({mesage: "Not Successful"})
+    }
+    console.log("Connected!");
+    con.query(`delete from vocabulary where word='${word}' and uid='${uid}'`,function(error, result, fields) {
+      console.log(result);
+  });
+    //res.send({message: "successful"});
+});
+}
+catch(error)
+{
+console.log(error);
+}
+})
+
     app.post('/download', (req, res) =>  {
     console.log("Body:")
   //console.log(req.body.lesson)
@@ -248,24 +318,15 @@ app.get('/vocabulary',(req, res) => {
     secretAccessKey: "XcxtlzNc7Ly72mWwzfUR1e8+ksxEDmcjeBOjZ6h1"
   });
   con.connect(function(err) {
-    con.query(`SELECT * FROM details`, function(err, result, fields) {
+    con.query(`SELECT * FROM vocabulary`, function(err, result, fields) {
       if (err) console.log(err);
       if (result) 
       {
-        //console.log(result)
-        var promises = result.map(lesson => {
-          return s3.getObject({Bucket: 'lessonfiles', Key: lesson.name+".txt"}).promise().then((data) => {
-            var enc = new TextDecoder("utf-8");
-            var arr = new Uint8Array(data.Body);
-            //console.log(enc.decode(arr));
-            //writeFile('./test.txt', data.Body)
-            console.log('file downloaded successfully')
-            //mystring=mystring+enc.decode(arr)+" ";
-            //console.log(mystring);
-            return enc.decode(arr);
-            //res.json({string : enc.decode(arr)})
+        result.map(e => console.log(e.word))
+        var promises = result.map(e => {
+          return e.word
           })
-      })
+      }
       Promise.all(promises).then(function(results) {
         var mystring = ""
         //console.log(results)
@@ -275,10 +336,8 @@ app.get('/vocabulary',(req, res) => {
         console.log(mystring)
         res.json({string : mystring})
     })
-    }
+    })
   });
-
-  })
 })
 
 app.listen(process.env.PORT || 8080);
