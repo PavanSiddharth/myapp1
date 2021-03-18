@@ -10,7 +10,7 @@ const con = mysql.createConnection({
   host: "finaldb.cpehnlgbk0me.ap-south-1.rds.amazonaws.com",
   user: "admin",
   port: "3306",
-  password: "adminpassword",
+  password: "*",
   database: "lessons",
   queryTimeout: 6000,
   connectTimeout: 60000
@@ -59,7 +59,7 @@ app.post('/submit', (req, res) => {
 
             let s3 = new AWS.S3({
                 accessKeyId: "AKIAQC3RSOMX32RZBBOO",
-                secretAccessKey: "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",
+                secretAccessKey: "*",
                 Bucket: "lessonfiles",
               });
     
@@ -169,7 +169,7 @@ function encode(data){
 async function getImage(img) {
 var s3 = new AWS.S3({
   accessKeyId: "AKIAQC3RSOMX32RZBBOO",
-  secretAccessKey: "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"
+  secretAccessKey: "*"
 });
 const data =  s3.getObject(
   {
@@ -198,7 +198,7 @@ app.post('/testimage',(req, res) => {
         host: "finaldb.cpehnlgbk0me.ap-south-1.rds.amazonaws.com",
         user: "admin",
         port: "3306",
-        password: "adminpassword",
+        password: "*",
         database: "lessons",
         queryTimeout: 6000,
         connectTimeout: 60000
@@ -233,7 +233,7 @@ app.post('/testimage',(req, res) => {
         host: "finaldb.cpehnlgbk0me.ap-south-1.rds.amazonaws.com",
         user: "admin",
         port: "3306",
-        password: "adminpassword",
+        password: "*",
         database: "lessons",
         queryTimeout: 6000,
         connectTimeout: 60000
@@ -269,7 +269,7 @@ console.log(error);
 
   var s3 = new AWS.S3({
     accessKeyId: "AKIAQC3RSOMX32RZBBOO",
-    secretAccessKey: "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"
+    secretAccessKey: "*"
   });
 
 //const writeFile = util.promisify(fs.writeFile)
@@ -290,7 +290,7 @@ s3.getObject({Bucket: 'lessonfiles', Key: req.body.lesson+".txt"}).promise().the
 app.get('/vocabulary',(req, res) => {
   var s3 = new AWS.S3({
     accessKeyId: "AKIAQC3RSOMX32RZBBOO",
-    secretAccessKey: "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"
+    secretAccessKey: "*"
   });
   con.connect(function(err) {
     con.query(`SELECT * FROM vocabulary`, function(err, result, fields) {
